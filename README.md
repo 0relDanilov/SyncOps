@@ -1,91 +1,110 @@
 SyncOps - Kubernetes GitOps Dashboard 🚀
 
-SyncOps is a GitOps-powered Kubernetes dashboard that leverages ArgoCD, AWS, Terraform, and GitHub Actions to automate deployments, monitor clusters, and streamline DevOps workflows. This project aims to simplify Kubernetes application management while providing visibility into deployments.
+SyncOps is a GitOps-powered Kubernetes dashboard that leverages ArgoCD, Helm, Minikube, Docker, and GitHub Actions to automate deployments, monitor clusters, and streamline DevOps workflows. This project simplifies local Kubernetes application management and provides visibility into deployments without relying on cloud providers.
 
-- 🌟 Features
-GitOps-driven Deployment – Uses ArgoCD to sync applications automatically from a Git repository.
-Automated CI/CD Pipeline – GitHub Actions for building and deploying Docker images.
-Infrastructure as Code – Terraform provisions Kubernetes clusters on AWS.
-Monitoring & Visualization – Prometheus and Grafana for metrics collection and real-time dashboards.
+🌟 Features
+
+GitOps-Driven Deployment – Uses ArgoCD to sync applications automatically from a Git repository.
+
+Helm Chart Integration – Deploy applications using Helm for better templating and version management.
+
+Automated CI/CD Pipeline – GitHub Actions for local Minikube-based testing and deployment.
+
+Local Monitoring & Visualization – Prometheus & Grafana for real-time metrics and dashboards.
+
+Docker Support – Enables containerized application development and deployment where applicable.
+
 Secure & Scalable – Implements RBAC for access control and supports multi-environment deployments.
 
-- 📁 Project Structure
-SyncOps/
-│── infra/               # Terraform scripts for AWS infrastructure
-│── manifests/           # Kubernetes YAML manifests for ArgoCD applications
-│── ci-cd/               # GitHub Actions workflows for CI/CD
-│── monitoring/          # Prometheus and Grafana configurations
-│── docs/                # Documentation and architecture diagrams
-│── sample-app/          # Simple web application for testing deployment
-│── README.md            # You are here 🚀
+📁 Project Structure
 
-- 🛠️ Tech Stack
+SyncOps/
+│── charts/          # Helm charts for applications and infrastructure
+│── manifests/       # Kubernetes YAML manifests for ArgoCD and supporting services
+│── ci-cd/           # GitHub Actions workflows for CI/CD
+│── monitoring/      # Prometheus and Grafana configurations
+│── sample-app/      # Simple web application for testing
+│── docker/          # Dockerfiles and container configurations
+│── docs/            # Documentation and architecture diagrams
+│── README.md        # You are here 🚀
+
+🛠️ Tech Stack
+
 Kubernetes – Container orchestration
+
+Minikube – Local Kubernetes cluster
+
 ArgoCD – GitOps continuous deployment
-Terraform – Infrastructure as Code (IaC)
-AWS EKS – Managed Kubernetes service
+
+Helm – Package management for Kubernetes applications
+
+Docker – Containerization (optional but supported)
+
 GitHub Actions – CI/CD automation
-Docker – Containerization
+
 Prometheus & Grafana – Monitoring and visualization
 
-- 🚀 Getting Started
+🚀 Getting Started
 
-1️⃣ Prerequisites:
-AWS CLI installed and configured
-Terraform (latest version)
-kubectl and k9s for managing Kubernetes
-ArgoCD CLI installed (brew install argocd on macOS)
-Docker & GitHub CLI installed
+1️⃣ Install Prerequisites
 
-2️⃣ Clone the Repository:
-git clone https://github.com/Orel-Danilov/SyncOps.git
-cd SyncOps
+Ensure the following are installed:
 
-3️⃣ Deploy Infrastructure on AWS:
-cd infra
-terraform init
-terraform apply
+brew install minikube kubectl helm argocd docker
 
-4️⃣ Configure ArgoCD:
-kubectl port-forward svc/argocd-server -n argocd 8080:443
-argocd login localhost:8080
+2️⃣ Start Minikube
 
-5️⃣ Deploy Applications
-kubectl apply -f manifests/
+minikube start --driver=docker
 
-6️⃣ Monitor Your Cluster
-Access ArgoCD Dashboard: https://localhost:8080
-Check Grafana: kubectl port-forward svc/grafana 3000:3000
+3️⃣ Deploy ArgoCD
 
--📊 Monitoring & Observability
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl port-forward svc/argocd-server -n argocd 8080:443 &
+
+Retrieve the admin password:
+
+kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode
+
+Access the ArgoCD Web UI at: https://localhost:8080
+
+4️⃣ Deploy Applications with Helm
+
+helm install my-app charts/sample-app --namespace default
+
+5️⃣ Set Up Monitoring (Prometheus & Grafana)
+
+kubectl create namespace monitoring
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring
+kubectl port-forward svc/grafana -n monitoring 3000:3000 &
+
+Access Grafana at: http://localhost:3000
+(Default login: admin / prom-operator)
+
+📊 Monitoring & Observability
 
 Prometheus scrapes cluster metrics.
+
 Grafana provides real-time visualization.
+
 ArgoCD UI offers deployment insights.
 
--🛡️ Security Best Practices
+🛡️ Security Best Practices
 
 RBAC Policies – Restrict user access to Kubernetes resources.
-Secret Management – Uses Kubernetes Secrets and Vault (optional).
+
+Secret Management – Uses Kubernetes Secrets (Vault optional).
+
 ArgoCD Authentication – Configured with OAuth or SSO.
 
--📜 Roadmap
+👨‍💻 Contributing
 
-✅ Setup AWS EKS with Terraform
-✅ Implement GitOps workflow with ArgoCD
-✅ Deploy sample application
-☑️ Enhance monitoring with custom Grafana dashboards
-☑️ Implement automated rollbacks
-☑️ Add Helm support for app deployment
-
--👨‍💻 Contributing
 Contributions are welcome! Open an issue or submit a PR with improvements.
 
-- 📄 License
+📄 License
+
 This project is licensed under MIT License.
 
-🔥 SyncOps makes Kubernetes GitOps seamless. Star ⭐ this repo if you like the project! 🚀
-
-
-
+🔥 SyncOps makes Kubernetes GitOps seamless, even locally. Star ⭐ this repo if you like the project! 🚀
 
