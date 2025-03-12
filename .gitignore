@@ -1,0 +1,16 @@
+# Ignore OS files
+.DS_Store
+
+# Ignore local dependencies
+node_modules/
+vendor/
+
+# Ignore build artifacts
+*.log
+*.out
+*.swp
+
+# Ignore Kubernetes config
+.kube/
+.helm/
+
